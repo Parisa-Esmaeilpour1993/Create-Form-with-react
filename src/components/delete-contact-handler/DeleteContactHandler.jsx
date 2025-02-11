@@ -1,5 +1,6 @@
 // DeleteContactHandler.js
 import { toast } from "react-toastify";
+import { deleteContact } from "../../services/ContactService";
 
 export default function DeleteContactHandler({
   contactToDelete,
@@ -13,11 +14,7 @@ export default function DeleteContactHandler({
     if (!contactToDelete) return;
 
     try {
-      await fetch(
-        `https://676d4ea00e299dd2ddff1999.mockapi.io/usersList/${contactToDelete.id}`,
-        { method: "DELETE" }
-      );
-
+      await deleteContact(contactToDelete.id);
       setContacts(
         contacts.filter((contact) => contact.id !== contactToDelete.id)
       );

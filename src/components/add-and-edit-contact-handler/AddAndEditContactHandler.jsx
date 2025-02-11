@@ -1,6 +1,7 @@
 import { toast } from "react-toastify";
 import { Validation } from "../../utils/validation/Validation";
 import { ContactDuplication } from "../contact-duplication/ContactDuplication";
+import { addContact, updateContact } from "../../services/ContactService";
 
 export default function AddAndEditContactHandler({
   newContact,
@@ -20,31 +21,6 @@ export default function AddAndEditContactHandler({
       return;
     }
 
-    // const duplicateContact = contacts.find(
-    //   (contact) =>
-    //     contact.email.toLowerCase().trim() ===
-    //       newContact.email.toLowerCase().trim() ||
-    //     contact.phoneNumber === newContact.phoneNumber ||
-    //     (contact.firstName.toLowerCase().trim() ===
-    //       newContact.firstName.toLowerCase().trim() &&
-    //       contact.lastName.toLowerCase().trim() ===
-    //         newContact.lastName.toLowerCase().trim())
-    // );
-
-    // if (duplicateContact && !isEditing) {
-    //   const confirmEdit = window.confirm(
-    //     "This contact already exists. Do you want to edit it instead?"
-    //   );
-    //   if (confirmEdit) {
-    //     setNewContact(duplicateContact);
-    //     setIsEditing(true);
-    //     return;
-    //   } else {
-    //     toast.info("Duplicate contact was not added.");
-    //     resetForm();
-    //     return;
-    //   }
-    // }
     const { checkDuplicate } = ContactDuplication(
       contacts,
       newContact,
@@ -59,15 +35,7 @@ export default function AddAndEditContactHandler({
 
     if (isEditing) {
       try {
-        const response = await fetch(
-          `https://676d4ea00e299dd2ddff1999.mockapi.io/usersList/${newContact.id}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newContact),
-          }
-        );
-        const updatedContact = await response.json();
+        const updatedContact = await updateContact(newContact.id, newContact);
         setContacts(
           contacts.map((contact) =>
             contact.id === updatedContact.id ? updatedContact : contact
@@ -82,15 +50,7 @@ export default function AddAndEditContactHandler({
     } else {
       setIsLoading(true);
       try {
-        const response = await fetch(
-          "https://676d4ea00e299dd2ddff1999.mockapi.io/usersList",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newContact),
-          }
-        );
-        const data = await response.json();
+        const data = await addContact(newContact);
         setContacts([...contacts, data]);
         toast.success("Contact added successfully!");
         resetForm();

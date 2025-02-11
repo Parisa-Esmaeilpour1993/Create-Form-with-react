@@ -6,7 +6,7 @@ import ContactList from "../contact-list/ContactList";
 import Header from "../header/Header";
 import ResetForm from "../reset-form/ResetForm";
 import DeleteContact from "../delete-contact/DeleteContact";
-import GetContactHandler from "../get-contact-handler/GetContactHandler";
+import { fetchContacts } from "../../services/ContactService";
 
 export default function HomeComponent() {
   const [contacts, setContacts] = useState([]);
@@ -23,7 +23,6 @@ export default function HomeComponent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [contactToDelete, setContactToDelete] = useState(null);
   const { isDarkMode, toggleDarkMode } = UseDarkMode();
-  const { fetchContacts } = GetContactHandler({ setContacts, setIsLoading });
   const { resetForm } = ResetForm(setNewContact, setIsEditing);
   const { handleContact } = AddAndEditContactHandler({
     newContact,
@@ -38,7 +37,18 @@ export default function HomeComponent() {
   });
 
   useEffect(() => {
-    fetchContacts();
+    async function loadContacts() {
+      try {
+        setIsLoading(true);
+        const data = await fetchContacts(setIsLoading);
+        setContacts(data);
+      } catch (error) {
+        console.error("Error fetching contacts:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadContacts();
   }, []);
 
   function handleInputChange(e) {
