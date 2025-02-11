@@ -43,6 +43,9 @@ export default function HomeComponent() {
 
   function handleInputChange(e) {
     const { name, value } = e.target;
+    if (setErrors) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    }
     setNewContact((prevContact) => ({
       ...prevContact,
       [name]: value,
